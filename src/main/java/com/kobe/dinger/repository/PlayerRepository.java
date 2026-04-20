@@ -26,4 +26,6 @@ public interface PlayerRepository extends JpaRepository<Player, Integer> {
     */
     public List<Player> findByPlayerNameContainingIgnoreCase(String name);
 
+    public boolean existsByMlbPlayerId(Integer mlbPlayerId);
+
 }

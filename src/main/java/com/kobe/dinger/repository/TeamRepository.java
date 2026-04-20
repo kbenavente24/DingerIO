@@ -10,7 +10,9 @@ import com.kobe.dinger.model.Team;
 
 @Repository
 public interface TeamRepository extends JpaRepository<Team, Integer> {
-    public Optional<Team> findByMlbTeamId(Integer mlbPlayerId);
+    public Optional<Team> findByMlbTeamId(Integer mlbTeamId);
+
+    public boolean existsByMlbTeamId(Integer mlbTeamId);
 
     public List<Team> findByTeamNameContainingIgnoreCase(String name);
 
