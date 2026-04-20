@@ -34,11 +34,17 @@ public abstract class Subscription {
     @CreationTimestamp
     private Instant createdAt;
 
-    private boolean notifyEveryInning;
+    private boolean notifyEveryInning; 
 
     private boolean notifyEndOfGame;
 
-    public Subscription() {}
+    public Subscription(User user, boolean notifyEveryInning, boolean notifyEndOfGame) {
+
+        this.user = user;
+        this.notifyEveryInning = notifyEveryInning;
+        this.notifyEndOfGame = notifyEndOfGame;
+
+    }
 
     public Integer getSubscriptionId() { return subscriptionId; }
     public void setSubscriptionId(Integer subscriptionId) { this.subscriptionId = subscriptionId; }

@@ -31,7 +31,11 @@ public class User {
     @CreationTimestamp
     private Instant createdAt;
 
-    public User() {}
+    public User(String email, String username, String password) {
+        this.email = email;
+        this.username = username;
+        this.passwordHash = password;
+    }
 
     public Integer getUserId() { return userId; }
     public void setUserId(Integer userId) { this.userId = userId; }

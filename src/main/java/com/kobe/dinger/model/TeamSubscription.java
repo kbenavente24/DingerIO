@@ -17,7 +17,12 @@ public class TeamSubscription extends Subscription {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    public TeamSubscription() {}
+    public TeamSubscription(User user, boolean notifyEveryInning, boolean notifyEndOfGame, Team team) {
+
+        super(user, notifyEveryInning, notifyEndOfGame);
+        this.team = team;
+
+    }
 
     public Team getTeam() { return team; }
     public void setTeam(Team team) { this.team = team; }

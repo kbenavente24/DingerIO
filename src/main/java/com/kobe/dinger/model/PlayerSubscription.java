@@ -13,7 +13,12 @@ public class PlayerSubscription extends Subscription {
     @JoinColumn(name = "player_id")
     private Player player;
 
-    public PlayerSubscription() {}
+    public PlayerSubscription(User user, boolean notifyEveryInning, boolean notifyEndOfGame, Player player) {
+
+        super(user, notifyEveryInning, notifyEndOfGame);
+        this.player = player;
+
+    }
 
     public Player getPlayer(){
         return this.player;
