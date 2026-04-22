@@ -1,7 +1,10 @@
 package com.kobe.dinger.service;
 
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 
+import com.kobe.dinger.model.NotificationEvent;
 import com.kobe.dinger.model.Team;
 import com.kobe.dinger.model.TeamSubscription;
 import com.kobe.dinger.model.User;
@@ -30,13 +33,17 @@ public class SubscriptionService {
             this.teamRepository = teamRepository;
     }
 
-    public TeamSubscription createTeamSubscription(Integer userId, boolean notifyEveryInning, boolean notifyEndOfGame, Integer teamId){
+    public TeamSubscription createInitialTeamSubscription(Integer userId, Set<NotificationEvent> events, Integer teamId){
 
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User does not exist"));
 
         Team team = teamRepository.findById(teamId).orElseThrow(() -> new RuntimeException("Team does not exist"));
 
-        TeamSubscription teamSubscription = new TeamSubscription(user, notifyEveryInning, notifyEndOfGame, team);
+        TeamSubscription teamSubscription = new TeamSubscription(user, team);
+
+        for(NotificationEvent event : events){
+            teamSubscription.getNotificationEvents().add(event);
+        }
 
         teamSubscriptionRepository.save(teamSubscription);
         return teamSubscription;

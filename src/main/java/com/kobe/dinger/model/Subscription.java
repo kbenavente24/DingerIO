@@ -1,10 +1,18 @@
 package com.kobe.dinger.model;
 
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,16 +42,23 @@ public abstract class Subscription {
     @CreationTimestamp
     private Instant createdAt;
 
-    private boolean notifyEveryInning; 
+    /*Self reminder: notificationEvents stores which in-game events this subscription should trigger a notification for.
+    Rather than using individual booleans like before, we use a Set of enums mapped to a separate junction table (subscription_events).
+    JPA manages that table automatically--no need for a separate entity class because subscription_events only exists
+    to serve the subscription. It has no independent lifecycle, no extra fields, and would never be queried on its own.
+    @ElementCollection is designed exactly for this case where the data is too simple to justify a full entity.
+    */
+    @ElementCollection(fetch = FetchType.EAGER) // tells JPA this is a collection of simple values (enums), not a full entity; EAGER loads the events immediately with the subscription so they're available outside the session
+    @CollectionTable(name = "subscription_events", joinColumns = @JoinColumn(name = "subscription_id")) // names the junction table and the foreign key column pointing back to this subscription
+    @Column(name = "event_type") // names the column that stores the enum value
+    @Enumerated(EnumType.STRING) // stores the enum as its name (e.g. "INNING_CHANGE") instead of a number, so reordering enums won't corrupt data
+    private Set<NotificationEvent> notificationEvents;
 
-    private boolean notifyEndOfGame;
+    protected Subscription() {}
 
-    public Subscription(User user, boolean notifyEveryInning, boolean notifyEndOfGame) {
-
+    public Subscription(User user) {
         this.user = user;
-        this.notifyEveryInning = notifyEveryInning;
-        this.notifyEndOfGame = notifyEndOfGame;
-
+        this.notificationEvents = new HashSet<>();
     }
 
     public Integer getSubscriptionId() { return subscriptionId; }
@@ -55,9 +70,13 @@ public abstract class Subscription {
     public Instant getCreatedAt() { return createdAt; }
     public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
 
-    public boolean isNotifyEveryInning() { return notifyEveryInning; }
-    public void setNotifyEveryInning(boolean notifyEveryInning) { this.notifyEveryInning = notifyEveryInning; }
+    public Set<NotificationEvent> getNotificationEvents(){
+        return this.notificationEvents;
+    }
 
-    public boolean isNotifyEndOfGame() { return notifyEndOfGame; }
-    public void setNotifyEndOfGame(boolean notifyEndOfGame) { this.notifyEndOfGame = notifyEndOfGame; }
+    public void setNotificationEvents(Set<NotificationEvent> notificationEvents){
+        this.notificationEvents = notificationEvents;
+    }
 }
+
+

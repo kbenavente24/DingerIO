@@ -31,6 +31,8 @@ public class User {
     @CreationTimestamp
     private Instant createdAt;
 
+    protected User() {}
+
     public User(String email, String username, String password) {
         this.email = email;
         this.username = username;
