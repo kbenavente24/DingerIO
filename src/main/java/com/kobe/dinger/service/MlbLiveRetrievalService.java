@@ -5,13 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.kobe.dinger.DTOs.LiveFeedResponseDTO;
-import com.kobe.dinger.DTOs.LinescoreDTO;
+import com.kobe.dinger.DTOs.livegamefeed.LinescoreDTO;
+import com.kobe.dinger.DTOs.livegamefeed.LiveFeedResponseDTO;
 import com.kobe.dinger.model.GameState;
 import com.kobe.dinger.model.NotificationEvent;
 import com.kobe.dinger.model.TeamSubscription;

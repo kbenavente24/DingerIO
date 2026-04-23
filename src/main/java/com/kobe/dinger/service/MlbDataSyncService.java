@@ -3,10 +3,10 @@ package com.kobe.dinger.service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.kobe.dinger.DTOs.PlayerDTO;
-import com.kobe.dinger.DTOs.PlayerResponseDTO;
-import com.kobe.dinger.DTOs.TeamDTO;
-import com.kobe.dinger.DTOs.TeamResponseDTO;
+import com.kobe.dinger.DTOs.sync.PlayerDTO;
+import com.kobe.dinger.DTOs.sync.PlayerResponseDTO;
+import com.kobe.dinger.DTOs.sync.TeamDTO;
+import com.kobe.dinger.DTOs.sync.TeamResponseDTO;
 import com.kobe.dinger.model.Player;
 import com.kobe.dinger.model.Team;
 import com.kobe.dinger.repository.PlayerRepository;

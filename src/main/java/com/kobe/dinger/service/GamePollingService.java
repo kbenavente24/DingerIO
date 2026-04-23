@@ -12,9 +12,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.kobe.dinger.DTOs.DateDTO;
-import com.kobe.dinger.DTOs.GameDTO;
-import com.kobe.dinger.DTOs.ScheduleResponseDTO;
+import com.kobe.dinger.DTOs.schedule.DateDTO;
+import com.kobe.dinger.DTOs.schedule.GameDTO;
+import com.kobe.dinger.DTOs.schedule.ScheduleResponseDTO;
 import com.kobe.dinger.model.GameState;
 import com.kobe.dinger.model.Team;
 import com.kobe.dinger.model.TeamSubscription;
