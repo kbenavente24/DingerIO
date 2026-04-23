@@ -5,5 +5,6 @@ public enum NotificationEvent {
     HALF_INNING_CHANGE,
     SCORE_CHANGE,
     HOMERUN,
+    HIT,
     GAME_END
 }

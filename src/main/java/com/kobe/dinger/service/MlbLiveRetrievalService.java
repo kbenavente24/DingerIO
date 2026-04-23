@@ -33,6 +33,9 @@ public class MlbLiveRetrievalService {
             return;
         }
 
+        String awayName = feed.getGameData().getTeams().getAway().getName();
+        String homeName = feed.getGameData().getTeams().getHome().getName();
+
         LinescoreDTO linescore = feed.getLiveData().getLinescore();
         if (linescore.getCurrentInning() == null || linescore.getTeams() == null) {
             return;
@@ -61,11 +64,20 @@ public class MlbLiveRetrievalService {
         }
         int homeRunCount = awayHomeRuns + homeHomeRuns;
 
+        int awayHits = 0;
+        if (linescore.getTeams().getAway().getHits() != null){
+            awayHits = linescore.getTeams().getAway().getHits();
+        }
+        int homeHits = 0;
+        if (linescore.getTeams().getHome().getHits() != null){
+            homeHits = linescore.getTeams().getHome().getHits();
+        }
+
         GameState previous = lastGameState.get(gamePk);
 
         // first time seeing this game — store state without notifying to avoid a flood on startup
         if (previous == null) {
-            lastGameState.put(gamePk, new GameState(currentInning, inningHalf, awayScore, homeScore, homeRunCount));
+            lastGameState.put(gamePk, new GameState(currentInning, inningHalf, awayScore, homeScore, homeRunCount, awayHits, homeHits));
             return;
         }
 
@@ -76,6 +88,8 @@ public class MlbLiveRetrievalService {
         boolean halfChanged = inningChanged || !inningHalf.equals(previous.getInningHalf());
         boolean scoreChanged = awayScore != previous.getAwayScore() || homeScore != previous.getHomeScore();
         boolean homeRunScored = homeRunCount > previous.getHomeRunCount();
+        boolean awayHitOccured = awayHits > previous.getAwayHits();
+        boolean homeHitOccured = homeHits > previous.getHomeHits();
 
         for (TeamSubscription sub : allSubscriptions) {
             Set<NotificationEvent> events = sub.getNotificationEvents();
@@ -92,8 +106,14 @@ public class MlbLiveRetrievalService {
             if (homeRunScored && events.contains(NotificationEvent.HOMERUN)) {
                 notificationService.sendNotification(sub, "Home run! Away: " + awayScore + ", Home: " + homeScore);
             }
+            if (awayHitOccured && events.contains(NotificationEvent.HIT)) {
+                notificationService.sendNotification(sub, awayName + " made a hit!");
+            }
+            if (homeHitOccured && events.contains(NotificationEvent.HIT)) {
+                notificationService.sendNotification(sub, homeName + " made a hit!");
+            }
         }
 
-        lastGameState.put(gamePk, new GameState(currentInning, inningHalf, awayScore, homeScore, homeRunCount));
+        lastGameState.put(gamePk, new GameState(currentInning, inningHalf, awayScore, homeScore, homeRunCount, awayHits, homeHits));
     }
 }
