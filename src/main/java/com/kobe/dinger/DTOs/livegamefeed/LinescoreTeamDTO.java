@@ -1,4 +1,4 @@
-package com.kobe.dinger.DTOs;
+package com.kobe.dinger.DTOs.livegamefeed;
 
 public class LinescoreTeamDTO {
     private Integer runs;

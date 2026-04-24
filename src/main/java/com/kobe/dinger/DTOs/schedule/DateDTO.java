@@ -1,4 +1,4 @@
-package com.kobe.dinger.DTOs;
+package com.kobe.dinger.DTOs.schedule;
 
 import java.util.List;
 

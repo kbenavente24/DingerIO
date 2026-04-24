@@ -1,4 +1,4 @@
-package com.kobe.dinger.DTOs;
+package com.kobe.dinger.DTOs.schedule;
 
 public class GameDTO {
     private Integer gamePk;

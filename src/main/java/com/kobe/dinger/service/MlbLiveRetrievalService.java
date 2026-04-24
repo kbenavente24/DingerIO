@@ -8,6 +8,7 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.kobe.dinger.DTOs.livegamefeed.AllPlaysDTO;
 import com.kobe.dinger.DTOs.livegamefeed.LinescoreDTO;
 import com.kobe.dinger.DTOs.livegamefeed.LiveFeedResponseDTO;
 import com.kobe.dinger.model.GameState;
@@ -39,8 +40,16 @@ public class MlbLiveRetrievalService {
             return;
         }
 
+        
+
         int currentInning = linescore.getCurrentInning();
         String inningHalf = linescore.getInningHalf();
+
+        List<Integer> scoringPlays = new ArrayList<>();
+        if(feed.getScoringPlays() != null){
+            scoringPlays.addAll(feed.getScoringPlays());
+        }
+
         int awayScore = 0;
         if (linescore.getTeams().getAway().getRuns() != null) {
             awayScore = linescore.getTeams().getAway().getRuns();
@@ -75,7 +84,7 @@ public class MlbLiveRetrievalService {
 
         // first time seeing this game — store state without notifying to avoid a flood on startup
         if (previous == null) {
-            lastGameState.put(gamePk, new GameState(currentInning, inningHalf, awayScore, homeScore, homeRunCount, awayHits, homeHits));
+            lastGameState.put(gamePk, new GameState(currentInning, inningHalf, awayScore, homeScore, homeRunCount, awayHits, homeHits, scoringPlays));
             return;
         }
 
@@ -84,10 +93,10 @@ public class MlbLiveRetrievalService {
 
         boolean inningChanged = currentInning > previous.getCurrentInning();
         boolean halfChanged = inningChanged || !inningHalf.equals(previous.getInningHalf());
-        boolean scoreChanged = awayScore != previous.getAwayScore() || homeScore != previous.getHomeScore();
         boolean homeRunScored = homeRunCount > previous.getHomeRunCount();
         boolean awayHitOccured = awayHits > previous.getAwayHits();
         boolean homeHitOccured = homeHits > previous.getHomeHits();
+        boolean scoreChanged = previous.getScoringPlays().size() < scoringPlays.size(); 
 
         for (TeamSubscription sub : allSubscriptions) {
             Set<NotificationEvent> events = sub.getNotificationEvents();
@@ -102,7 +111,15 @@ public class MlbLiveRetrievalService {
                 notificationService.sendNotification(sub, "Score update — Away: " + awayScore + ", Home: " + homeScore);
             }
             if (homeRunScored && events.contains(NotificationEvent.HOMERUN)) {
-                notificationService.sendNotification(sub, "Home run! Away: " + awayScore + ", Home: " + homeScore);
+                List<AllPlaysDTO> allPlays = feed.getLiveData().getAllPlays();
+                int lastScoringPlayID = scoringPlays.getLast();
+
+                for(int i = allPlays.size() - 1; i >= 0; i--){
+                    if(allPlays.get(i).getAbout().getAtBatIndex() == lastScoringPlayID){
+                        notificationService.sendNotification(sub, allPlays.get(i).getResult().getDescription());
+                        break;
+                    }
+                }
             }
             if (awayHitOccured && events.contains(NotificationEvent.HIT)) {
                 notificationService.sendNotification(sub, awayName + " made a hit!");
@@ -112,6 +129,6 @@ public class MlbLiveRetrievalService {
             }
         }
 
-        lastGameState.put(gamePk, new GameState(currentInning, inningHalf, awayScore, homeScore, homeRunCount, awayHits, homeHits));
+        lastGameState.put(gamePk, new GameState(currentInning, inningHalf, awayScore, homeScore, homeRunCount, awayHits, homeHits, scoringPlays));
     }
 }

@@ -1,4 +1,4 @@
-package com.kobe.dinger.DTOs;
+package com.kobe.dinger.DTOs.sync;
 
 public class TeamDTO {
     private Integer id;
