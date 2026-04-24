@@ -108,9 +108,6 @@ public class MlbLiveRetrievalService {
                 notificationService.sendNotification(sub, inningHalf + " of inning " + currentInning + " has started!");
             }
             if (scoreChanged && events.contains(NotificationEvent.SCORE_CHANGE)) {
-                notificationService.sendNotification(sub, "Score update — Away: " + awayScore + ", Home: " + homeScore);
-            }
-            if (homeRunScored && events.contains(NotificationEvent.HOMERUN)) {
                 List<AllPlaysDTO> allPlays = feed.getLiveData().getAllPlays();
                 int lastScoringPlayID = scoringPlays.getLast();
 
@@ -121,6 +118,9 @@ public class MlbLiveRetrievalService {
                     }
                 }
             }
+            if (homeRunScored && events.contains(NotificationEvent.HOMERUN)) {
+                notificationService.sendNotification(sub, "Home run! Away: " + awayScore + ", Home: " + homeScore);
+            }
             if (awayHitOccured && events.contains(NotificationEvent.HIT)) {
                 notificationService.sendNotification(sub, awayName + " made a hit!");
             }
@@ -130,5 +130,41 @@ public class MlbLiveRetrievalService {
         }
 
         lastGameState.put(gamePk, new GameState(currentInning, inningHalf, awayScore, homeScore, homeRunCount, awayHits, homeHits, scoringPlays));
+    }
+    
+    public void processGameEnd(Integer gamePk, List<TeamSubscription> awaySubscriptions, List<TeamSubscription> homeSubscriptions, Map<Integer, GameState> lastGameState){
+        GameState previous = lastGameState.get(gamePk);
+
+        // if previous == null then the game is not being tracked, meaning a final game notification was sent already and gamePk was removed from lastGameState hashmap in 
+        // GamePollingService class
+        if (previous == null) {
+            return;
+        }
+        String url = "https://statsapi.mlb.com/api/v1.1/game/" + gamePk + "/feed/live";
+        LiveFeedResponseDTO feed = restTemplate.getForObject(url, LiveFeedResponseDTO.class);
+
+        if (feed == null || feed.getLiveData() == null || feed.getLiveData().getLinescore() == null) {
+            return;
+        }
+
+        String awayName = feed.getGameData().getTeams().getAway().getName();
+        String homeName = feed.getGameData().getTeams().getHome().getName();
+
+        LinescoreDTO linescore = feed.getLiveData().getLinescore();
+        if (linescore.getCurrentInning() == null || linescore.getTeams() == null) {
+            return;
+        }
+
+        List<TeamSubscription> allSubscriptions = new ArrayList<>(awaySubscriptions);
+        allSubscriptions.addAll(homeSubscriptions);
+
+        for (TeamSubscription sub : allSubscriptions) {
+            Set<NotificationEvent> events = sub.getNotificationEvents();
+            if (events.contains(NotificationEvent.GAME_END)) {
+                notificationService.sendNotification(sub, "Game has ended! Final Score: " + homeName + ": " + feed.getLiveData().getLinescore().getTeams().getHome().getRuns()
+            + " - " + awayName + ": " + feed.getLiveData().getLinescore().getTeams().getAway().getRuns());
+            }
+        }
+        lastGameState.remove(gamePk);
     }
 }

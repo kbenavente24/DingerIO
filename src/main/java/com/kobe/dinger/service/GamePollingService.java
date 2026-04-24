@@ -59,13 +59,11 @@ public class GamePollingService {
         log.info("Found {} games today", games.size());
 
         for (GameDTO game : games) {
-            if (!"Live".equals(game.getStatus().getAbstractGameState())) {
+            if (!"Live".equals(game.getStatus().getAbstractGameState()) && !"Final".equals(game.getStatus().getAbstractGameState())) {
                 continue;
             }
-
             Integer awayTeamMlbId = game.getTeams().getAway().getTeam().getId();
             Integer homeTeamMlbId = game.getTeams().getHome().getTeam().getId();
-            log.info("Live game found: gamePk={} ({} vs {})", game.getGamePk(), awayTeamMlbId, homeTeamMlbId);
 
             Team awayTeam = teamRepository.findByMlbTeamId(awayTeamMlbId).orElse(null);
             Team homeTeam = teamRepository.findByMlbTeamId(homeTeamMlbId).orElse(null);
@@ -90,7 +88,11 @@ public class GamePollingService {
             }
 
             log.info("Processing gamePk={} — {} away subs, {} home subs", game.getGamePk(), awaySubscriptions.size(), homeSubscriptions.size());
-            mlbLiveRetrievalService.processGame(game.getGamePk(), awaySubscriptions, homeSubscriptions, lastGameState);
+            if ("Final".equals(game.getStatus().getAbstractGameState())) {
+                mlbLiveRetrievalService.processGameEnd(game.getGamePk(),awaySubscriptions, homeSubscriptions, lastGameState);
+            } else {
+                mlbLiveRetrievalService.processGame(game.getGamePk(), awaySubscriptions, homeSubscriptions, lastGameState);
+            }
         }
     }
 }
