@@ -46,8 +46,8 @@ public class MlbLiveRetrievalService {
         String inningHalf = linescore.getInningHalf();
 
         List<Integer> scoringPlays = new ArrayList<>();
-        if(feed.getScoringPlays() != null){
-            scoringPlays.addAll(feed.getScoringPlays());
+        if(feed.getLiveData().getPlays().getScoringPlays() != null){
+            scoringPlays.addAll(feed.getLiveData().getPlays().getScoringPlays());
         }
 
         int awayScore = 0;
@@ -108,7 +108,7 @@ public class MlbLiveRetrievalService {
                 notificationService.sendNotification(sub, inningHalf + " of inning " + currentInning + " has started!");
             }
             if (scoreChanged && events.contains(NotificationEvent.SCORE_CHANGE)) {
-                List<AllPlaysDTO> allPlays = feed.getLiveData().getAllPlays();
+                List<AllPlaysDTO> allPlays = feed.getLiveData().getPlays().getAllPlays();
                 int lastScoringPlayID = scoringPlays.getLast();
 
                 for(int i = allPlays.size() - 1; i >= 0; i--){

@@ -4,11 +4,11 @@ import java.util.List;
 
 public class LiveDataDTO {
     private LinescoreDTO linescore;
-    private List<AllPlaysDTO> allPlays;
+    private PlaysDTO plays;
 
     public LinescoreDTO getLinescore() { return linescore; }
     public void setLinescore(LinescoreDTO linescore) { this.linescore = linescore; }
 
-    public List<AllPlaysDTO> getAllPlays(){return allPlays;}
-    public void setAllPlays(List<AllPlaysDTO> allPlays){this.allPlays = allPlays;}
+    public PlaysDTO getPlays() {return plays; }
+    public void setPlays(PlaysDTO plays){this.plays = plays;}
 }
