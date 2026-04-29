@@ -2,6 +2,7 @@ package com.kobe.dinger.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class GamePollingService {
         this.notificationService = notificationService;
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 15000)
     public void pollGames(){
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String url = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=" + today;
@@ -68,30 +69,20 @@ public class GamePollingService {
             Team awayTeam = teamRepository.findByMlbTeamId(awayTeamMlbId).orElse(null);
             Team homeTeam = teamRepository.findByMlbTeamId(homeTeamMlbId).orElse(null);
 
-            List<TeamSubscription> awaySubscriptions;
-            if (awayTeam != null) {
-                awaySubscriptions = teamSubscriptionRepository.findByTeam(awayTeam);
-            } else {
-                awaySubscriptions = List.of();
-            }
+            List<TeamSubscription> subscriptions;
 
-            List<TeamSubscription> homeSubscriptions;
-            if (homeTeam != null) {
-                homeSubscriptions = teamSubscriptionRepository.findByTeam(homeTeam);
-            } else {
-                homeSubscriptions = List.of();
-            }
+            subscriptions = new ArrayList<>(teamSubscriptionRepository.findByTeam(awayTeam));
+            subscriptions.addAll(teamSubscriptionRepository.findByTeam(homeTeam));
 
-            if (awaySubscriptions.isEmpty() && homeSubscriptions.isEmpty()) {
+            if (subscriptions.isEmpty()) {
                 log.info("No subscriptions for gamePk={}, skipping", game.getGamePk());
                 continue;
             }
 
-            log.info("Processing gamePk={} — {} away subs, {} home subs", game.getGamePk(), awaySubscriptions.size(), homeSubscriptions.size());
             if ("Final".equals(game.getStatus().getAbstractGameState())) {
-                mlbLiveRetrievalService.processGameEnd(game.getGamePk(),awaySubscriptions, homeSubscriptions, lastGameState);
+                mlbLiveRetrievalService.processGameEnd(game.getGamePk(), subscriptions, lastGameState);
             } else {
-                mlbLiveRetrievalService.processGame(game.getGamePk(), awaySubscriptions, homeSubscriptions, lastGameState);
+                mlbLiveRetrievalService.processGame(game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
             }
         }
     }

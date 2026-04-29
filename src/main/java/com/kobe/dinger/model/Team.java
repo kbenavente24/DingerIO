@@ -33,4 +33,17 @@ public class Team {
 
     public String getLogoImageUrl() { return logoImageUrl; }
     public void setLogoImageUrl(String logoImageUrl) { this.logoImageUrl = logoImageUrl; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Team)) return false;
+        Team other = (Team) o;
+        return mlbTeamId != null && mlbTeamId.equals(other.mlbTeamId);
+    }
+
+    @Override
+    public int hashCode() {
+        return mlbTeamId != null ? mlbTeamId.hashCode() : 0;
+    }
 }
