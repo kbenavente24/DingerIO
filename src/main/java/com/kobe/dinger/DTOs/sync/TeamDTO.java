@@ -2,7 +2,7 @@ package com.kobe.dinger.DTOs.sync;
 
 public class TeamDTO {
     private Integer id;
-    private String name;
+    private String teamName;
 
     public Integer getId(){
         return this.id;
@@ -12,11 +12,11 @@ public class TeamDTO {
         this.id = id;
     }
 
-    public String getName(){
-        return this.name;
+    public String getTeamName(){
+        return this.teamName;
     }
 
-    public void setName(String name){
-        this.name = name;
+    public void setTeamName(String teamName){
+        this.teamName = teamName;
     }
 }

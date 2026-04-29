@@ -39,12 +39,12 @@ public class MlbDataSyncService {
         for(TeamDTO team : response.getTeams()){
             if(teamRepository.existsByMlbTeamId(team.getId())){
                 Team existingTeam = teamRepository.findByMlbTeamId(team.getId()).get();
-                existingTeam.setTeamName(team.getName());
+                existingTeam.setTeamName(team.getTeamName());
                 teamRepository.save(existingTeam);
             } else {
                 Team newTeam = new Team();
                 newTeam.setMlbTeamId(team.getId());
-                newTeam.setTeamName(team.getName());
+                newTeam.setTeamName(team.getTeamName());
                 teamRepository.save(newTeam);
             }
         }
