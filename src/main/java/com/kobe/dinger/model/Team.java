@@ -20,6 +20,9 @@ public class Team {
 
     private String logoImageUrl;
 
+    private String teamEmoji;
+
+
     public Team() {}
 
     public Integer getTeamId() { return teamId; }
@@ -33,6 +36,9 @@ public class Team {
 
     public String getLogoImageUrl() { return logoImageUrl; }
     public void setLogoImageUrl(String logoImageUrl) { this.logoImageUrl = logoImageUrl; }
+
+    public String getTeamEmoji(){return teamEmoji;}
+    public void setTeamEmoji(String teamEmoji){ this.teamEmoji = teamEmoji; }
 
     @Override
     public boolean equals(Object o) {

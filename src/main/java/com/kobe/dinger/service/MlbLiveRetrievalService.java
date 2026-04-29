@@ -111,18 +111,30 @@ public class MlbLiveRetrievalService {
                     if(allPlays.get(i).getAbout().getAtBatIndex() == lastScoringPlayID){
                         if("home_run".equals(allPlays.get(i).getResult().getEventType())){
                             if(sub.getTeam().equals(homeTeam) && "bottom".equals(allPlays.get(i).getAbout().getHalfInning())){
-                                notificationService.sendNotification(sub, "YOUR TEAM HIT A HOME RUN!\n" + allPlays.get(i).getResult().getDescription());
+                                notificationService.sendNotification(sub, homeTeam.getTeamEmoji() + " HOME RUN! "+ homeTeam.getTeamEmoji() + "\n" 
+                                + allPlays.get(i).getResult().getDescription());
                                 break;
                             } else if(sub.getTeam().equals(awayTeam) && "top".equals(allPlays.get(i).getAbout().getHalfInning())){
-                                notificationService.sendNotification(sub, "YOUR TEAM HIT A HOME RUN!\n" + allPlays.get(i).getResult().getDescription());
+                                notificationService.sendNotification(sub, awayTeam.getTeamEmoji() +  " HOME RUN! " + awayTeam.getTeamEmoji() + "\n" 
+                                + allPlays.get(i).getResult().getDescription());
                                 break;
                             } else {
                                 notificationService.sendNotification(sub, allPlays.get(i).getResult().getDescription());
                                 break;                                 
                             }
                         } else {
-                            notificationService.sendNotification(sub, allPlays.get(i).getResult().getDescription());
-                            break;                            
+                            if(sub.getTeam().equals(homeTeam) && "bottom".equals(allPlays.get(i).getAbout().getHalfInning())){
+                                notificationService.sendNotification(sub, homeTeam.getTeamEmoji() + homeTeam.getTeamName() + " score! " + homeTeam.getTeamEmoji() + "\n" 
+                                + allPlays.get(i).getResult().getDescription());
+                                break;                                
+                            } else if(sub.getTeam().equals(awayTeam) && "top".equals(allPlays.get(i).getAbout().getHalfInning())){
+                                notificationService.sendNotification(sub, awayTeam.getTeamEmoji() + awayTeam.getTeamName() + " score! " + awayTeam.getTeamEmoji() + "\n" 
+                                + allPlays.get(i).getResult().getDescription());
+                                break;    
+                            } else{
+                                notificationService.sendNotification(sub, allPlays.get(i).getResult().getDescription());
+                                break;     
+                            }                      
                         }
                     }
                 }
