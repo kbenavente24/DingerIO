@@ -38,7 +38,8 @@ public class MlbLiveRetrievalService {
             return;
         }
 
-    
+        int currentHomeScore = linescore.getTeams().getHome().getRuns();
+        int currentAwayScore = linescore.getTeams().getAway().getRuns();
         int currentInning = linescore.getCurrentInning();
         String inningHalf = linescore.getInningHalf();
 
@@ -54,8 +55,6 @@ public class MlbLiveRetrievalService {
             lastGameState.put(gamePk, new GameState(currentInning, inningHalf, scoringPlays));
             return;
         }
-
-        //Top inning = true means away team is batting. 
 
         boolean inningChanged = currentInning > previous.getCurrentInning();
         boolean halfChanged = inningChanged || !inningHalf.equals(previous.getInningHalf());
@@ -100,9 +99,15 @@ public class MlbLiveRetrievalService {
 
         for (TeamSubscription sub : subscriptions) {
             Set<NotificationEvent> events = sub.getNotificationEvents();
+            boolean subbedTeamIsHomeTeam = sub.getTeam().equals(homeTeam);
 
             //notify on every inning change
             if (inningChanged && events.contains(NotificationEvent.INNING_CHANGE)) {
+                if(currentInning > 1){
+                    notificationService.sendNotification(sub, "Inning " + Integer.toString(currentInning - 1) + " has ended \n" +
+                    "Score heading into the " + inningHalf + " of inning " + currentInning + ": " + 
+                    generateLineScores(subbedTeamIsHomeTeam, currentHomeScore, currentAwayScore, homeTeam, awayTeam));
+                }
                 notificationService.sendNotification(sub, inningHalf + " of inning " + currentInning + " has started!");
             }
 
@@ -113,8 +118,6 @@ public class MlbLiveRetrievalService {
             
             //notify on every score change
             if (scoreChanged && events.contains(NotificationEvent.SCORE_CHANGE)) {
-
-                boolean subbedTeamIsHomeTeam = sub.getTeam().equals(homeTeam);
                 String message = generateScoringMessage(scoringPlayDescription, latestHomeScore, latestAwayScore, homeRunScored, homeTeamScored, awayTeamScored,homeTeam, awayTeam,
                     subbedTeamIsHomeTeam);
                 notificationService.sendNotification(sub, message);
