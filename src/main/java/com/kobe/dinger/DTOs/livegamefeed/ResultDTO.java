@@ -4,6 +4,8 @@ public class ResultDTO {
     
     private String description;
     private String eventType;
+    private int homeScore;
+    private int awayScore;
 
     public String getDescription(){return description;}
 
@@ -12,5 +14,14 @@ public class ResultDTO {
     public String getEventType(){return eventType;}
 
     public void setEventType(String eventType){this.eventType = eventType;}
+
+    public int getHomeScore(){return homeScore;}
+    
+    public void setHomeScore(int homeScore){this.homeScore = homeScore;}
+
+    public int getAwayScore(){return awayScore;}
+    
+    public void setAwayScore(int awayScore){this.awayScore = awayScore;}
+
 
 }
