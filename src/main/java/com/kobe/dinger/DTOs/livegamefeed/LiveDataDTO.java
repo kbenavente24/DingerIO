@@ -1,7 +1,5 @@
 package com.kobe.dinger.DTOs.livegamefeed;
 
-import java.util.List;
-
 public class LiveDataDTO {
     private LinescoreDTO linescore;
     private PlaysDTO plays;
