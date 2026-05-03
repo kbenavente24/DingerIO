@@ -1,5 +1,6 @@
 package com.kobe.dinger.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import com.kobe.dinger.model.Team;
 import com.kobe.dinger.model.TeamSubscription;
 import com.kobe.dinger.repository.TeamRepository;
 import com.kobe.dinger.repository.TeamSubscriptionRepository;
+import java.time.ZoneOffset;
 
 @Service
 public class GamePollingService {
@@ -43,9 +45,18 @@ public class GamePollingService {
 
     @Scheduled(fixedRate = 15000)
     public void pollGames(){
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        String url = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=" + today;
-        log.info("Polling games for {}", today);
+
+
+        LocalDate todayUTC = LocalDate.now(ZoneOffset.UTC);
+        String todayToString = todayUTC.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String scheduleForWeekUrl = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&startDate=" + todayToString + "&endDate=";
+
+        if(todayUTC.getDayOfWeek() == DayOfWeek.MONDAY){
+            scheduleForWeekUrl = scheduleForWeekUrl + todayUTC.plusDays(6).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }
+
+        String url = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=" + todayToString;
+        log.info("Polling games for {}", todayToString);
 
         //ScheduleResponseDTO has list of Date DTOs -> DateDTO has list of GameDTOs -> GameDTO has GamePK and DTOs for status (live, ended, etc), and teams (away and home)
         //Summary: This DTO is used for getting the games for the current day in order to process their live data
