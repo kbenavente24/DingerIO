@@ -54,26 +54,22 @@ public class GamePollingService {
         ScheduleResponseDTO schedule = restTemplate.getForObject(scheduleForWeekUrl, ScheduleResponseDTO.class);
 
         if (schedule == null || schedule.getDates() == null || schedule.getDates().isEmpty()) {
-            log.info("No games scheduled today");
+            log.info("Error getting schedule");
             return;
         }
 
-        List<Team> teams = teamRepository.findAll();
-        List<Integer> teamIds = teams.stream()
-            .map(Team::getId)
-            .collect(Collectors.toList());
-
-
-        List<TeamSubscription> teamSubs = teamSubscriptionRepository.findByTeamIdIn(teamIds);
+        List<TeamSubscription> teamSubs = teamSubscriptionRepository.findAll();
         List<DateDTO> dates = schedule.getDates();
 
         HashMap<Integer, String> teamScheduleStrings = new HashMap<>();
 
         for(DateDTO date : dates){
             for(GameDTO game : date.getGames()){
-                teamScheduleStrings.put(game.getTeams().getHome().getTeam().getId(), teamScheduleStrings.getOrDefault(game.getTeams().getHome().getTeam().getId(), "") + date.getDate() + ": vs " + game.getTeams().getAway().getTeam().getName() + "\n");
+                teamScheduleStrings.put(game.getTeams().getHome().getTeam().getId(), teamScheduleStrings.getOrDefault(game.getTeams().getHome().getTeam().getId(), "") 
+                + date.getDate() + ": vs " + game.getTeams().getAway().getTeam().getName() + "\n");
 
-                teamScheduleStrings.put(game.getTeams().getAway().getTeam().getId(), teamScheduleStrings.getOrDefault(game.getTeams().getAway().getTeam().getId(), "") + date.getDate() + ": vs" + game.getTeams().getHome().getTeam().getName() + "\n");
+                teamScheduleStrings.put(game.getTeams().getAway().getTeam().getId(), teamScheduleStrings.getOrDefault(game.getTeams().getAway().getTeam().getId(), "") 
+                + date.getDate() + ": vs " + game.getTeams().getHome().getTeam().getName() + "\n");
             }
         }
 
@@ -82,7 +78,8 @@ public class GamePollingService {
                 String stringToSendOut = teamScheduleStrings.get(subscription.getTeam().getMlbTeamId());
                 //send out string in future method
             }
-        }      
+        }
+       
     }
 
     @Scheduled(fixedRate = 15000)
