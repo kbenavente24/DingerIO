@@ -6,5 +6,6 @@ public enum NotificationEvent {
     SCORE_CHANGE,
     HOMERUN,
     HIT,
-    GAME_END
+    GAME_END,
+    WEEKLY_SCHEDULE
 }
