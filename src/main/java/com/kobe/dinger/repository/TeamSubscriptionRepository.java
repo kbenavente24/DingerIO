@@ -11,5 +11,6 @@ import com.kobe.dinger.model.TeamSubscription;
 public interface TeamSubscriptionRepository extends JpaRepository<TeamSubscription, Integer>{
     
     public List<TeamSubscription> findByTeam(Team team);
-    
+
+    public List<TeamSubscription> findByTeamIdIn(List<Integer> ids);
 }

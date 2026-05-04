@@ -47,19 +47,6 @@ public class GamePollingService {
     @Scheduled(cron = "0 0 9 * * MON", zone = "UTC")
     public void weeklyMondayPoll() {
 
-        /*
-        
-        - get schedule for the week and pass it on:
-        - get every team sub
-        - pass on team subs
-        
-
-        -list of team subs
-        -for(size of teams):
-            -hit repo to check if sub exists for team, if it does, add to list of team subs
-            -
-        */
-
         LocalDate todayUTC = LocalDate.now(ZoneOffset.UTC);
         String todayToString = todayUTC.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String scheduleForWeekUrl = "https://statsapi.mlb.com/api/v1/schedule?sportId=1&startDate=" + todayToString + "&endDate=" + todayUTC.plusDays(6).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -95,26 +82,7 @@ public class GamePollingService {
                 String stringToSendOut = teamScheduleStrings.get(subscription.getTeam().getMlbTeamId());
                 //send out string in future method
             }
-        }
-
-        /*
-
-        hashmap key = team, value = string of schedule info
-        
-        for every game in list, put into hashmap (key = team, value = add to string of schedule info)
-        
-        for every team sub:
-            - get team and get team.mlbteamid
-            
-        
-                
-    
-        */
-
-
-
-
-       
+        }      
     }
 
     @Scheduled(fixedRate = 15000)
