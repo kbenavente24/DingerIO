@@ -4,6 +4,8 @@ public class GameDTO {
     private Integer gamePk;
     private GameStatusDTO status;
     private GameTeamsDTO teams;
+    private String gameDate; 
+
 
     public Integer getGamePk() { return gamePk; }
     public void setGamePk(Integer gamePk) { this.gamePk = gamePk; }
@@ -13,4 +15,11 @@ public class GameDTO {
 
     public GameTeamsDTO getTeams() { return teams; }
     public void setTeams(GameTeamsDTO teams) { this.teams = teams; }
+
+    public String getGameDate() {
+        return gameDate;
+    }
+    public void setGameDate(String gameDate) {
+        this.gameDate = gameDate;
+    }
 }

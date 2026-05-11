@@ -60,8 +60,11 @@ public class MlbLiveRetrievalService {
         GameState previous = lastGameState.get(gamePk);
 
         // first time seeing this game — store state without notifying to avoid a flood on startup
-        if (previous == null) {
-            lastGameState.put(gamePk, new GameState(currentInning, inningHalf, scoringPlays));
+        if (!previous.isLiveGameInitialized()) {
+            previous.setLiveGameInitialized(true);
+            previous.setScoringPlays(scoringPlays);
+            previous.setCurrentInning(currentInning);
+            previous.setInningHalf(inningHalf);
             return;
         }
 
@@ -118,7 +121,6 @@ public class MlbLiveRetrievalService {
                     "Score heading into the " + inningHalf + " of inning " + currentInning + ": " + 
                     generateLineScores(subbedTeamIsHomeTeam, currentHomeScore, currentAwayScore, homeTeam, awayTeam));
                 }
-                notificationService.sendNotification(sub, inningHalf + " of inning " + currentInning + " has started!");
             }
 
             //notify on every inning + top and bottom
@@ -133,7 +135,9 @@ public class MlbLiveRetrievalService {
                 notificationService.sendNotification(sub, message);
             }
         }
-        lastGameState.put(gamePk, new GameState(currentInning, inningHalf, scoringPlays));
+        lastGameState.get(gamePk).setCurrentInning(currentInning);
+        lastGameState.get(gamePk).setInningHalf(inningHalf);
+        lastGameState.get(gamePk).setScoringPlays(scoringPlays);
     }
 
     private String generateScoringMessage(String scoringPlayDescription, int latestHomeScore, int latestAwayScore, boolean homeRunScored, boolean homeTeamScored, boolean awayTeamScored, Team homeTeam,Team awayTeam, boolean subbedTeamIsHomeTeam){

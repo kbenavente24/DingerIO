@@ -1,7 +1,9 @@
 package com.kobe.dinger.service;
 
 import java.time.DayOfWeek;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +25,11 @@ import com.kobe.dinger.model.Team;
 import com.kobe.dinger.model.TeamSubscription;
 import com.kobe.dinger.repository.TeamRepository;
 import com.kobe.dinger.repository.TeamSubscriptionRepository;
+
+import com.kobe.dinger.service.PreGameService;
+
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
@@ -34,16 +40,18 @@ public class GamePollingService {
     private TeamRepository teamRepository;
     private MlbLiveRetrievalService mlbLiveRetrievalService;
     private NotificationService notificationService;
+    private PreGameService preGameService;
     private RestTemplate restTemplate = new RestTemplate();
     private Map<Integer, GameState> lastGameState = new HashMap<>();
 
     public GamePollingService(TeamSubscriptionRepository teamSubscriptionRepository, TeamRepository teamRepository, MlbLiveRetrievalService mlbLiveRetrievalService,
-        NotificationService notificationService
+        NotificationService notificationService, PreGameService preGameService
     ){
         this.teamSubscriptionRepository = teamSubscriptionRepository;
         this.teamRepository = teamRepository;
         this.mlbLiveRetrievalService = mlbLiveRetrievalService;
         this.notificationService = notificationService;
+        this.preGameService = preGameService;
     }
     
     @Scheduled(cron = "0 0 6 * * MON")//Sends a notification at 6am pdt and 9am pst every monday
@@ -106,9 +114,7 @@ public class GamePollingService {
         log.info("Found {} games today", games.size());
 
         for (GameDTO game : games) {
-            if (!"Live".equals(game.getStatus().getAbstractGameState()) && !"Final".equals(game.getStatus().getAbstractGameState())) {
-                continue;
-            }
+
             Integer awayTeamMlbId = game.getTeams().getAway().getTeam().getId();
             Integer homeTeamMlbId = game.getTeams().getHome().getTeam().getId();
 
@@ -127,8 +133,15 @@ public class GamePollingService {
 
             if ("Final".equals(game.getStatus().getAbstractGameState())) {
                 mlbLiveRetrievalService.processGameEnd(game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
-            } else {
-                mlbLiveRetrievalService.processGame(game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
+            } else{ 
+                if(!lastGameState.containsKey(game.getGamePk())){
+                lastGameState.put(game.getGamePk(), new GameState(0, "", new ArrayList<>()));
+                }
+                if(Instant.parse(game.getGameDate()).isAfter(Instant.now())){
+                    preGameService.processGame(game, game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
+                } else {
+                    mlbLiveRetrievalService.processGame(game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
+                }
             }
         }
     }
