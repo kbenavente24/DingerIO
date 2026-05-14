@@ -87,10 +87,14 @@ public class GameEndService {
         }
 
         // standings haven't updated yet. retry on next poll.
-        if(homeTeamWins.equals(previous.getHomeWins()) && homeTeamLosses.equals(previous.getHomeLosses())
-        && awayTeamWins.equals(previous.getAwayWins()) && awayTeamLosses.equals(previous.getAwayLosses())){
+        if(homeTeamWins.equals(previous.getHomeWins()) && homeTeamLosses.equals(previous.getHomeLosses())){
             return;
         }
+        if(awayTeamWins.equals(previous.getAwayWins()) && awayTeamLosses.equals(previous.getAwayLosses())){
+            return;
+        }
+
+
 
         String url = "https://statsapi.mlb.com/api/v1.1/game/" + gamePk + "/feed/live";
         LiveFeedResponseDTO feed = restTemplate.getForObject(url, LiveFeedResponseDTO.class);
