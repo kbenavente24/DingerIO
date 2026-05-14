@@ -1,13 +1,14 @@
 package com.kobe.dinger.service;
 
-import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -26,13 +27,6 @@ import com.kobe.dinger.model.TeamSubscription;
 import com.kobe.dinger.repository.TeamRepository;
 import com.kobe.dinger.repository.TeamSubscriptionRepository;
 
-import com.kobe.dinger.service.PreGameService;
-
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.TextStyle;
-import java.util.Locale;
-
 @Service
 public class GamePollingService {
     private static final Logger log = LoggerFactory.getLogger(GamePollingService.class);
@@ -41,20 +35,22 @@ public class GamePollingService {
     private MlbLiveRetrievalService mlbLiveRetrievalService;
     private NotificationService notificationService;
     private PreGameService preGameService;
+    private GameEndService gameEndService;
     private RestTemplate restTemplate = new RestTemplate();
     private Map<Integer, GameState> lastGameState = new HashMap<>();
 
     public GamePollingService(TeamSubscriptionRepository teamSubscriptionRepository, TeamRepository teamRepository, MlbLiveRetrievalService mlbLiveRetrievalService,
-        NotificationService notificationService, PreGameService preGameService
+        NotificationService notificationService, PreGameService preGameService, GameEndService gameEndService
     ){
         this.teamSubscriptionRepository = teamSubscriptionRepository;
         this.teamRepository = teamRepository;
         this.mlbLiveRetrievalService = mlbLiveRetrievalService;
         this.notificationService = notificationService;
         this.preGameService = preGameService;
+        this.gameEndService = gameEndService;
     }
     
-    @Scheduled(cron = "0 0 6 * * MON")//Sends a notification at 6am pdt and 9am pst every monday
+    @Scheduled(cron = "0 0 6 * * MON")//Sends a notification at 6am pdt and 9am est every monday
     public void weeklyMondayPoll() {
 
         LocalDate todayUTC = LocalDate.now(ZoneOffset.UTC);
@@ -115,8 +111,6 @@ public class GamePollingService {
 
         for (GameDTO game : games) {
 
-            int gameKey = game.getGamePk();
-
             Integer awayTeamMlbId = game.getTeams().getAway().getTeam().getId();
             Integer homeTeamMlbId = game.getTeams().getHome().getTeam().getId();
 
@@ -133,8 +127,12 @@ public class GamePollingService {
                 continue;
             }
 
-            if ("Final".equals(game.getStatus().getAbstractGameState())) {
-                mlbLiveRetrievalService.processGameEnd(game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
+            if ("Final".equals(game.getStatus().getDetailedState()) || "Postponed".equals(game.getStatus().getDetailedState()) || "Game Over".equals(game.getStatus().getDetailedState())) {
+                if ("Postponed".equals(game.getStatus().getDetailedState())) {
+                    gameEndService.processPostponed(game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
+                } else {
+                    gameEndService.processGameEnd(game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
+                }
             } else{ 
                 if(!lastGameState.containsKey(game.getGamePk())){
                 lastGameState.put(game.getGamePk(), new GameState(0, "", new ArrayList<>()));

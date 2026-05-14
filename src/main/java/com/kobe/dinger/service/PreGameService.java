@@ -49,7 +49,7 @@ public class PreGameService{
 
                 long minutesUntilGame = ChronoUnit.MINUTES.between(now, gameTime);
 
-                if (minutesUntilGame <= 1 && minutesUntilGame > 0) {
+                if (minutesUntilGame <= 2 && minutesUntilGame > 0) {
                     StringBuilder stringToSend = new StringBuilder();
 
                     if(subbedTeamIsHomeTeam){
@@ -74,15 +74,15 @@ public class PreGameService{
 
                 long minutesUntilGame = ChronoUnit.MINUTES.between(now, gameTime);
 
-                if (minutesUntilGame <= 60 && minutesUntilGame > 55) {
+                if (minutesUntilGame <= 60 && minutesUntilGame > 57 ) {
                     StringBuilder stringToSend = new StringBuilder();
 
                     if(subbedTeamIsHomeTeam){
                         stringToSend.append(sub.getTeam().getTeamName() + " vs " + awayTeam.getTeamName()
-                        + " starts in one hour.");
+                        + " starts in one hour!");
                     } else {
                         stringToSend.append(sub.getTeam().getTeamName() + " vs " + homeTeam.getTeamName()
-                        + " starts in one hour.");
+                        + " starts in one hour!");
                     }
 
                     gameState.setGameStartingSoonNotificationSent(true);

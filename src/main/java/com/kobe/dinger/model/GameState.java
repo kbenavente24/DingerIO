@@ -3,6 +3,8 @@ package com.kobe.dinger.model;
 import java.util.List;
 
 public class GameState {
+    private String detailedState;
+    private String abstractGameState;
     private int currentInning;
     private String inningHalf;
     private List<Integer> scoringPlays;
@@ -25,6 +27,22 @@ public class GameState {
         this.isPreGameInitialized = true;
         this.isGameStartingSoonNotificationSent = false;
         this.isWinsAndLossesSet = false;
+    }
+
+    public String getDetailedState() {
+        return detailedState;
+    }
+
+    public void setDetailedState(String detailedState) {
+        this.detailedState = detailedState;
+    }
+
+    public String getAbstractGameState() {
+        return abstractGameState;
+    }
+
+    public void setAbstractGameState(String abstractGameState) {
+        this.abstractGameState = abstractGameState;
     }
 
     public int getCurrentInning(){
