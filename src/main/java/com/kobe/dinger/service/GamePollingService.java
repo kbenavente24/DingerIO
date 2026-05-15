@@ -133,7 +133,7 @@ public class GamePollingService {
                 } else {
                     gameEndService.processGameEnd(game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
                 }
-            } else{ 
+            } else if("In Progress".equals(game.getStatus().getDetailedState())){ 
                 if(!lastGameState.containsKey(game.getGamePk())){
                 lastGameState.put(game.getGamePk(), new GameState(0, "", new ArrayList<>()));
                 }
@@ -146,11 +146,24 @@ public class GamePollingService {
                     gs.setAwayLosses(game.getTeams().getAway().getLeagueRecord().getLosses());
                     gs.setWinsAndLossesSet(true);
                 }
-                if(Instant.parse(game.getGameDate()).isAfter(Instant.now())){
-                    preGameService.processGame(game, game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
-                } else {
-                    mlbLiveRetrievalService.processGame(game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
+                mlbLiveRetrievalService.processGame(game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
+
+            } else {
+                if(!lastGameState.containsKey(game.getGamePk())){
+                lastGameState.put(game.getGamePk(), new GameState(0, "", new ArrayList<>()));
                 }
+                
+                if(!lastGameState.get(game.getGamePk()).isWinsAndLossesSet()){
+                    GameState gs = lastGameState.get(game.getGamePk());
+                    gs.setHomeWins(game.getTeams().getHome().getLeagueRecord().getWins());
+                    gs.setHomeLosses(game.getTeams().getHome().getLeagueRecord().getLosses());
+                    gs.setAwayWins(game.getTeams().getAway().getLeagueRecord().getWins());
+                    gs.setAwayLosses(game.getTeams().getAway().getLeagueRecord().getLosses());
+                    gs.setWinsAndLossesSet(true);
+                }
+                lastGameState.get(game.getGamePk()).setLiveGameInitialized(true);
+                lastGameState.get(game.getGamePk()).setDetailedState(game.getStatus().getDetailedState());
+                preGameService.processGame(game, game.getGamePk(), subscriptions, lastGameState, homeTeam, awayTeam);
             }
         }
     }

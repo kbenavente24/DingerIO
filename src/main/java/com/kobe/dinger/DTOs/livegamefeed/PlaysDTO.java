@@ -5,7 +5,14 @@ import java.util.List;
 public class PlaysDTO {
     List<AllPlaysDTO> allPlays;
     List<Integer> scoringPlays;
+    CurrentPlayDTO currentPlay;
 
+    public CurrentPlayDTO getCurrentPlay() {
+        return currentPlay;
+    }
+    public void setCurrentPlay(CurrentPlayDTO currentPlay) {
+        this.currentPlay = currentPlay;
+    }
     public List<AllPlaysDTO> getAllPlays(){
         return allPlays;
     }

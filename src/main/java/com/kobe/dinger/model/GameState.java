@@ -17,6 +17,37 @@ public class GameState {
     private Integer homeLosses;
     private Integer awayWins;
     private Integer awayLosses;
+    private String currentPitcher;
+    private Integer currentPitcherId;
+    private boolean startingPitcherMessageSent;
+    private String homeStartingPitcher;
+    private String awayStartingPitcher;
+
+
+
+    public String getHomeStartingPitcher() {
+        return homeStartingPitcher;
+    }
+
+    public void setHomeStartingPitcher(String homeStartingPitcher) {
+        this.homeStartingPitcher = homeStartingPitcher;
+    }
+
+    public String getAwayStartingPitcher() {
+        return awayStartingPitcher;
+    }
+
+    public void setAwayStartingPitcher(String awayStartingPitcher) {
+        this.awayStartingPitcher = awayStartingPitcher;
+    }
+
+    public boolean isStartingPitcherMessageSent() {
+        return startingPitcherMessageSent;
+    }
+
+    public void setStartingPitcherMessageSent(boolean startingPitcherMessageSent) {
+        this.startingPitcherMessageSent = startingPitcherMessageSent;
+    }
 
     public GameState(int currentInning, String inningHalf, List<Integer> scoringPlays) {
         this.currentInning = currentInning;
@@ -27,6 +58,7 @@ public class GameState {
         this.isPreGameInitialized = true;
         this.isGameStartingSoonNotificationSent = false;
         this.isWinsAndLossesSet = false;
+        this.startingPitcherMessageSent = false;
     }
 
     public String getDetailedState() {
@@ -132,5 +164,21 @@ public class GameState {
 
     public void setWinsAndLossesSet(boolean isWinsAndLossesSet) {
         this.isWinsAndLossesSet = isWinsAndLossesSet;
+    }
+
+    public String getCurrentPitcher() {
+        return currentPitcher;
+    }
+
+    public void setCurrentPitcher(String currentPitcher) {
+        this.currentPitcher = currentPitcher;
+    }
+
+    public Integer getCurrentPitcherId() {
+        return currentPitcherId;
+    }
+
+    public void setCurrentPitcherId(Integer currentPitcherId) {
+        this.currentPitcherId = currentPitcherId;
     }
 }

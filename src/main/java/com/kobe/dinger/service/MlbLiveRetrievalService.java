@@ -43,6 +43,7 @@ public class MlbLiveRetrievalService {
         int currentInning = linescore.getCurrentInning();
         String inningHalf = linescore.getInningHalf();
 
+
         List<Integer> scoringPlays = new ArrayList<>();
         if(feed.getLiveData().getPlays().getScoringPlays() != null){
             scoringPlays.addAll(feed.getLiveData().getPlays().getScoringPlays());
@@ -50,7 +51,7 @@ public class MlbLiveRetrievalService {
 
         GameState previous = lastGameState.get(gamePk);
 
-        // first time seeing this game — store state without notifying to avoid a flood on startup
+        // check if game has been initialized as live (check if games are being tracked mid-game upon app start, if it is, return to prevent notification flooding)
         if (!previous.isLiveGameInitialized()) {
             previous.setLiveGameInitialized(true);
             previous.setScoringPlays(scoringPlays);
@@ -61,6 +62,17 @@ public class MlbLiveRetrievalService {
 
         boolean inningChanged = currentInning > previous.getCurrentInning();
         boolean halfChanged = inningChanged || !inningHalf.equals(previous.getInningHalf());
+
+        String startingHomePitcher = null;
+        String startingAwayPitcher = null;
+        boolean isStartOfGame = false;
+        //first time going from pre-game or warmup -> in progress (meaning game just started)
+        if (("Pre-Game".equals(previous.getDetailedState()) || "Warmup".equals(previous.getDetailedState())) && feed.getGameData().getProbablePitchers() != null) {
+            isStartOfGame = true;
+            startingHomePitcher = feed.getGameData().getProbablePitchers().getHome().getFullName();
+            startingAwayPitcher = feed.getGameData().getProbablePitchers().getAway().getFullName();
+            previous.setDetailedState(feed.getGameData().getStatus().getDetailedState());
+        }
 
         
         boolean scoreChanged = previous.getScoringPlays().size() < scoringPlays.size(); 
@@ -104,6 +116,11 @@ public class MlbLiveRetrievalService {
         for (TeamSubscription sub : subscriptions) {
             Set<NotificationEvent> events = sub.getNotificationEvents();
             boolean subbedTeamIsHomeTeam = sub.getTeam().equals(homeTeam);
+
+            if(events.contains(NotificationEvent.STARTING_PITCHER) && isStartOfGame){
+                notificationService.sendNotification(sub, "Starting pitchers:\n" + awayTeam.getTeamName() + ": " + startingAwayPitcher
+            + "\n" + homeTeam.getTeamName() + ": " + startingHomePitcher);
+            }
 
             //notify on every inning change
             if (inningChanged && events.contains(NotificationEvent.INNING_CHANGE)) {
