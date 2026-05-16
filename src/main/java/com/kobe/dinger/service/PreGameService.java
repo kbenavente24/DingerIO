@@ -49,7 +49,7 @@ public class PreGameService{
 
                 long minutesUntilGame = ChronoUnit.MINUTES.between(now, gameTime);
 
-                if (minutesUntilGame <= 2 && minutesUntilGame > 0) {
+                if (minutesUntilGame <= 5 && minutesUntilGame > 0) {
                     StringBuilder stringToSend = new StringBuilder();
 
                     if(subbedTeamIsHomeTeam){
