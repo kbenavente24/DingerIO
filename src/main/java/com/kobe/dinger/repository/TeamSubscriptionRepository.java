@@ -1,11 +1,13 @@
 package com.kobe.dinger.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import com.kobe.dinger.model.Team;
 import com.kobe.dinger.model.TeamSubscription;
+import com.kobe.dinger.model.User;
 
 @Repository
 public interface TeamSubscriptionRepository extends JpaRepository<TeamSubscription, Integer>{
@@ -13,4 +15,6 @@ public interface TeamSubscriptionRepository extends JpaRepository<TeamSubscripti
     public List<TeamSubscription> findByTeam(Team team);
 
     public List<TeamSubscription> findByTeamTeamIdIn(List<Integer> ids);
+
+    public Optional<TeamSubscription> findByUser(User user);
 }

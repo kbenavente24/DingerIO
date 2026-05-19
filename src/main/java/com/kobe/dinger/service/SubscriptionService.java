@@ -2,6 +2,8 @@ package com.kobe.dinger.service;
 
 import java.util.Set;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.kobe.dinger.model.NotificationEvent;
@@ -17,6 +19,7 @@ import com.kobe.dinger.repository.UserRepository;
 @Service
 public class SubscriptionService {
     
+    private final AuthenticationManager authenticationManager;
     private SubscriptionRepository subscriptionRepository;
     private TeamSubscriptionRepository teamSubscriptionRepository;
     private PlayerSubscriptionRepository playerSubscriptionRepository;
@@ -25,15 +28,18 @@ public class SubscriptionService {
 
 
     public SubscriptionService(SubscriptionRepository subscriptionRepository, TeamSubscriptionRepository teamSubscriptionRepository, 
-        PlayerSubscriptionRepository playerSubscriptionRepository, UserRepository userRepository, TeamRepository teamRepository){
+        PlayerSubscriptionRepository playerSubscriptionRepository, UserRepository userRepository, TeamRepository teamRepository, AuthenticationManager authenticationManager){
             this.subscriptionRepository = subscriptionRepository;
             this.teamSubscriptionRepository = teamSubscriptionRepository;
             this.playerSubscriptionRepository = playerSubscriptionRepository;
             this.userRepository = userRepository;
             this.teamRepository = teamRepository;
+            this.authenticationManager = authenticationManager;
     }
 
-    public TeamSubscription createInitialTeamSubscription(Integer userId, Set<NotificationEvent> events, Integer teamId){
+    public TeamSubscription createInitialTeamSubscription(Integer teamId){
+
+        Integer userId = Integer.parseInt(SecurityContextHolder.getContext().getAuthentication().getName());
 
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User does not exist"));
 
@@ -41,11 +47,17 @@ public class SubscriptionService {
 
         TeamSubscription teamSubscription = new TeamSubscription(user, team);
 
-        for(NotificationEvent event : events){
-            teamSubscription.getNotificationEvents().add(event);
-        }
-
         teamSubscriptionRepository.save(teamSubscription);
         return teamSubscription;
+    }
+
+
+    public void addSubscriptionEvent(NotificationEvent eventType){
+        Integer userId = Integer.parseInt(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User does not exist"));
+        TeamSubscription subscription = teamSubscriptionRepository.findByUser(user).orElseThrow(() -> new RuntimeException("User is not subscribed to a team"));
+
+        subscription.getNotificationEvents().add(eventType);
+        teamSubscriptionRepository.save(subscription);
     }
 }

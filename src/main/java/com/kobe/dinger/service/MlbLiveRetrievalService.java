@@ -1,6 +1,5 @@
 package com.kobe.dinger.service;
 
-import com.kobe.dinger.DingerApplication;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,15 +18,11 @@ import com.kobe.dinger.model.TeamSubscription;
 
 @Service
 public class MlbLiveRetrievalService {
-    private final DingerApplication dingerApplication;
-    private final GameEndService gameEndService;
     private RestTemplate restTemplate = new RestTemplate();
     private NotificationService notificationService;
 
-    public MlbLiveRetrievalService(NotificationService notificationService, GameEndService gameEndService, DingerApplication dingerApplication) {
+    public MlbLiveRetrievalService(NotificationService notificationService) {
         this.notificationService = notificationService;
-        this.gameEndService = gameEndService;
-        this.dingerApplication = dingerApplication;
     }
 
     public void processGame(Integer gamePk, List<TeamSubscription> subscriptions,  Map<Integer, GameState> lastGameState, Team homeTeam, Team awayTeam) {

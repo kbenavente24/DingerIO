@@ -3,7 +3,7 @@ package com.kobe.dinger.DTOs.standings;
 public class TeamRecordsDTO {
     private StandingsTeamDTO team;
     private LeagueRecordDTO leagueRecord;
-    private String leagueGamesBack;
+    private String divisionGamesBack;
     private String wildCardGamesBack;
 
     public StandingsTeamDTO getTeam(){
@@ -20,11 +20,11 @@ public class TeamRecordsDTO {
         this.leagueRecord = leagueRecord;
     }
 
-    public String getLeagueGamesBack(){
-        return leagueGamesBack;
+    public String getDivisionGamesBack() {
+        return divisionGamesBack;
     }
-    public void setLeagueGamesBack(String leagueGamesBack){
-        this.leagueGamesBack = leagueGamesBack;
+    public void setDivisionGamesBack(String divisionGamesBack) {
+        this.divisionGamesBack = divisionGamesBack;
     }
 
     public String getWildCardGamesBack(){
