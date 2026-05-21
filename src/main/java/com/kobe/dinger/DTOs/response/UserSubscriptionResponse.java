@@ -1,0 +1,34 @@
+package com.kobe.dinger.DTOs.response;
+
+import java.util.Set;
+
+import com.kobe.dinger.model.NotificationEvent;
+
+public class UserSubscriptionResponse {
+    
+    private Set<NotificationEvent> subbedEvents;
+    private String teamName;
+    private Integer teamId;
+
+
+    public Set<NotificationEvent> getSubbedEvents() {
+        return subbedEvents;
+    }
+    public void setSubbedEvents(Set<NotificationEvent> subbedEvents) {
+        this.subbedEvents = subbedEvents;
+    }
+    public String getTeamName() {
+        return teamName;
+    }
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
+    }
+    public Integer getTeamId() {
+        return teamId;
+    }
+    public void setTeamId(Integer teamId) {
+        this.teamId = teamId;
+    }
+
+
+}

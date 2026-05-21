@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.kobe.dinger.DTOs.response.UserSubscriptionResponse;
 import com.kobe.dinger.model.NotificationEvent;
 import com.kobe.dinger.model.Team;
 import com.kobe.dinger.model.TeamSubscription;
@@ -18,8 +19,7 @@ import com.kobe.dinger.repository.UserRepository;
 
 @Service
 public class SubscriptionService {
-    
-    private final AuthenticationManager authenticationManager;
+
     private SubscriptionRepository subscriptionRepository;
     private TeamSubscriptionRepository teamSubscriptionRepository;
     private PlayerSubscriptionRepository playerSubscriptionRepository;
@@ -28,13 +28,12 @@ public class SubscriptionService {
 
 
     public SubscriptionService(SubscriptionRepository subscriptionRepository, TeamSubscriptionRepository teamSubscriptionRepository, 
-        PlayerSubscriptionRepository playerSubscriptionRepository, UserRepository userRepository, TeamRepository teamRepository, AuthenticationManager authenticationManager){
+        PlayerSubscriptionRepository playerSubscriptionRepository, UserRepository userRepository, TeamRepository teamRepository){
             this.subscriptionRepository = subscriptionRepository;
             this.teamSubscriptionRepository = teamSubscriptionRepository;
             this.playerSubscriptionRepository = playerSubscriptionRepository;
             this.userRepository = userRepository;
             this.teamRepository = teamRepository;
-            this.authenticationManager = authenticationManager;
     }
 
     public TeamSubscription createInitialTeamSubscription(Integer teamId){
@@ -77,5 +76,18 @@ public class SubscriptionService {
 
         subscription.getNotificationEvents().remove(eventType);
         teamSubscriptionRepository.save(subscription);        
+    }
+
+    public UserSubscriptionResponse getUserSubscriptionInfo(){
+        Integer userId = Integer.parseInt(SecurityContextHolder.getContext().getAuthentication().getName());
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User does not exist"));
+        TeamSubscription subscription = teamSubscriptionRepository.findByUser(user).orElseThrow(() -> new RuntimeException("User is not subscribed to a team"));
+        UserSubscriptionResponse userSubscriptionResponse = new UserSubscriptionResponse();
+
+        userSubscriptionResponse.setSubbedEvents(subscription.getNotificationEvents());
+        userSubscriptionResponse.setTeamName(subscription.getTeam().getTeamName());
+        userSubscriptionResponse.setTeamId(subscription.getTeam().getTeamId());
+
+        return userSubscriptionResponse;
     }
 }
