@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.kobe.dinger.DTOs.schedule.GameDTO;
 import com.kobe.dinger.model.GameState;
@@ -20,13 +19,10 @@ import com.kobe.dinger.repository.TeamRepository;
 
 @Service
 public class PreGameService{
-    private RestTemplate restTemplate = new RestTemplate();
     private NotificationService notificationService;
-    private TeamRepository teamRepository;
 
     public PreGameService(NotificationService notificationService, TeamRepository teamRepository){
         this.notificationService = notificationService;
-        this.teamRepository = teamRepository;
     }
 
     public void processGame(GameDTO gameInfo, Integer gamePk, List<TeamSubscription> subscriptions, Map<Integer, GameState> lastGameState, Team homeTeam, Team awayTeam){

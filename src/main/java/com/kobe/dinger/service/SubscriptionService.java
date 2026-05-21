@@ -1,11 +1,7 @@
 package com.kobe.dinger.service;
 
-import java.util.Set;
-
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import com.kobe.dinger.DTOs.response.UserSubscriptionResponse;
 import com.kobe.dinger.model.NotificationEvent;
 import com.kobe.dinger.model.Team;
@@ -19,19 +15,14 @@ import com.kobe.dinger.repository.UserRepository;
 
 @Service
 public class SubscriptionService {
-
-    private SubscriptionRepository subscriptionRepository;
     private TeamSubscriptionRepository teamSubscriptionRepository;
-    private PlayerSubscriptionRepository playerSubscriptionRepository;
     private UserRepository userRepository;
     private TeamRepository teamRepository;
 
 
     public SubscriptionService(SubscriptionRepository subscriptionRepository, TeamSubscriptionRepository teamSubscriptionRepository, 
         PlayerSubscriptionRepository playerSubscriptionRepository, UserRepository userRepository, TeamRepository teamRepository){
-            this.subscriptionRepository = subscriptionRepository;
             this.teamSubscriptionRepository = teamSubscriptionRepository;
-            this.playerSubscriptionRepository = playerSubscriptionRepository;
             this.userRepository = userRepository;
             this.teamRepository = teamRepository;
     }

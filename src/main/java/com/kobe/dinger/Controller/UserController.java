@@ -6,18 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.kobe.dinger.DTOs.request.LoginRegisterRequest;
 import com.kobe.dinger.service.UserService;
-
-import io.micrometer.core.ipc.http.HttpSender.Response;
-
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
-
-
 
 @RestController
 @RequestMapping("/api/auth")
@@ -59,7 +50,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
-    
-    
-
 }
